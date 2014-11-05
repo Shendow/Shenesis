@@ -11,9 +11,12 @@ SH.Localization = {
 	["server_state_x"] = "SERVER STATE:",
 	["heist_x"] = "HEIST:",
 	["difficulty_x"] = "DIFFICULTY:",
+	["heisters_x"] = "PLAYERS: ",
 
 	["distance_filter"] = "DISTANCE FILTER",
 	["difficulty_filter"] = "DIFFICULTY FILTER",
+
+	["update"] = "UPDATE",
 }
 
 local OldLocalizationManagerText = LocalizationManager.text

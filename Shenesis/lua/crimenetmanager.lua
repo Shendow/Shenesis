@@ -66,9 +66,19 @@ function CrimeNetManager:_find_online_games_shenesis(friends_only)
 			self._active_server_jobs_shenesis[id] = nil
 		end
 
-		managers.menu_component:update_crimenet_server_list_shenesis(self._active_server_jobs_shenesis)
+		managers.menu_component:update_shenesis_server_list(self._active_server_jobs_shenesis)
 	end
 
 	managers.network.matchmake:register_callback("search_lobby", f)
 	managers.network.matchmake:search_lobby(friends_only)
+
+	-- Get total heisters
+	local usrs_f = function(success, amount)
+		print("usrs_f", success, amount)
+		if (success) then
+			managers.menu_component:set_shenesis_players_online(amount)
+		end
+	end
+	Steam:sa_handler():concurrent_users_callback(usrs_f)
+	Steam:sa_handler():get_concurrent_users()
 end

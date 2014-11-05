@@ -16,6 +16,12 @@ function PlayOnlineGui:init(ws, fullscreen_ws, node)
 end
 
 function PlayOnlineGui:start_finding_servers()
+	if (self.server_list_panels) then
+		for id, pnl in pairs (self.server_list_panels) do
+			self.list_panel:remove(pnl)
+		end
+	end
+
 	self.server_list = {}
 	self.server_list_panels = {}
 
@@ -55,25 +61,29 @@ function PlayOnlineGui:update_server_list(joblist)
 		y = y + he
 		self.server_list_panels[id] = jobpnl
 
-		local job_tweak = tweak_data.narrative:job_data(job.job_id)
-		local job_string = job.job_id and managers.localization:to_upper_text(job_tweak.name_id) or job.level_name or "NO JOB"
-		
-		local host_name = SH.QuickLabel(jobpnl, "host_name", job.host_name, nil, nil, nil, "center ")
-		local num_plrs = SH.QuickLabel(jobpnl, "num_plrs", job.num_plrs .. "/4", nil, nil, "right", "center")
-		local state_name = SH.QuickLabel(jobpnl, "state_name", job.state_name, nil, nil, "right", "center")
-		local level_name = SH.QuickLabel(jobpnl, "level_name", utf8.to_upper(job_string), nil, nil, "right", "center")
-		
-		managers.gui_data:safe_to_full_16_9(host_name:world_x(), host_name:world_center_y())
-		host_name:set_left(padding)
-		
-		managers.gui_data:safe_to_full_16_9(num_plrs:world_x(), num_plrs:world_center_y())
-		num_plrs:set_right(jobpnl:width() - padding)
+			local job_tweak = tweak_data.narrative:job_data(job.job_id)
+			local job_string = job.job_id and managers.localization:to_upper_text(job_tweak.name_id) or job.level_name or "NO JOB"
+			
+			local host_name = SH.QuickLabel(jobpnl, "host_name", job.host_name, nil, nil, nil, "center")
+			local num_plrs = SH.QuickLabel(jobpnl, "num_plrs", job.num_plrs .. "/4", nil, nil, "right", "center")
+			local state_name = SH.QuickLabel(jobpnl, "state_name", job.state_name, nil, nil, "right", "center")
+			local level_name = SH.QuickLabel(jobpnl, "level_name", utf8.to_upper(job_string), nil, nil, "right", "center")
+			
+			managers.gui_data:safe_to_full_16_9(host_name:world_x(), host_name:world_center_y())
+			host_name:set_left(padding)
+			host_name:set_center_y(jobpnl:height() * 0.5)
+			
+			managers.gui_data:safe_to_full_16_9(num_plrs:world_x(), num_plrs:world_center_y())
+			num_plrs:set_right(jobpnl:width() - padding)
+			num_plrs:set_center_y(jobpnl:height() * 0.5)
 
-		managers.gui_data:safe_to_full_16_9(state_name:world_x(), state_name:world_center_y())
-		state_name:set_right(jobpnl:width() - 30 - padding)
+			managers.gui_data:safe_to_full_16_9(state_name:world_x(), state_name:world_center_y())
+			state_name:set_right(jobpnl:width() - 30 - padding)
+			state_name:set_center_y(jobpnl:height() * 0.5)
 
-		managers.gui_data:safe_to_full_16_9(level_name:world_x(), level_name:world_center_y())
-		level_name:set_right(jobpnl:width() - 185 - padding)
+			managers.gui_data:safe_to_full_16_9(level_name:world_x(), level_name:world_center_y())
+			level_name:set_right(jobpnl:width() - 185 - padding)
+			level_name:set_center_y(jobpnl:height() * 0.5)
 	end
 end
 
@@ -159,6 +169,13 @@ function PlayOnlineGui:update_server_info(job)
 	-- self._briefing_label = briefing
 end
 
+function PlayOnlineGui:set_players_online(amount)
+	if not (self.heisters_label) then return end
+
+	local txt = utf8.to_upper(managers.localization:text("heisters_x")) .. managers.money:add_decimal_marks_to_string(string.format("%.3d", amount))
+	self.heisters_label:set_text(txt)
+end
+
 function PlayOnlineGui:_setup()
 	if (alive(self._panel)) then
 		self._ws:panel():remove(self._panel)
@@ -175,11 +192,11 @@ function PlayOnlineGui:_setup()
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel()
 	WalletGuiObject.set_wallet(self._panel)
 
-	local title_text = SH.QuickLabel(self._panel, "play_with_anyone", utf8.to_upper(managers.localization:text("play_with_anyone")), "large")
+	local title_text = SH.QuickLabel(self._panel, "play_online", utf8.to_upper(managers.localization:text("play_online")), "large")
 
 		local title_bg_text = self._fullscreen_panel:text({
-			name = "play_with_anyone",
-			text = utf8.to_upper(managers.localization:text("play_with_anyone")),
+			name = "play_online",
+			text = utf8.to_upper(managers.localization:text("play_online")),
 			h = 90,
 			align = "left",
 			vertical = "top",
@@ -260,7 +277,7 @@ function PlayOnlineGui:_setup()
 				layer = 2,
 				color = Color.white
 			})
-			scroll_up_indicator_arrow:set_center_x(self._list_scroll_bar_panel:w() / 2)
+			scroll_up_indicator_arrow:set_center_x(self._list_scroll_bar_panel:w() * 0.5)
 			local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
 			local scroll_down_indicator_arrow = self._list_scroll_bar_panel:bitmap({
 				name = "scroll_down_indicator_arrow",
@@ -271,7 +288,7 @@ function PlayOnlineGui:_setup()
 				rotation = 180
 			})
 			scroll_down_indicator_arrow:set_bottom(self._list_scroll_bar_panel:h())
-			scroll_down_indicator_arrow:set_center_x(self._list_scroll_bar_panel:w() / 2)
+			scroll_down_indicator_arrow:set_center_x(self._list_scroll_bar_panel:w() * 0.5)
 			local bar_h = scroll_down_indicator_arrow:top() - scroll_up_indicator_arrow:bottom()
 			self._list_scroll_bar_panel:rect({
 				color = Color.black,
@@ -279,7 +296,7 @@ function PlayOnlineGui:_setup()
 				y = scroll_up_indicator_arrow:bottom(),
 				h = bar_h,
 				w = 4
-			}):set_center_x(self._list_scroll_bar_panel:w() / 2)
+			}):set_center_x(self._list_scroll_bar_panel:w() * 0.5)
 			bar_h = scroll_down_indicator_arrow:bottom() - scroll_up_indicator_arrow:top()
 			local scroll_bar = self._list_scroll_bar_panel:panel({
 				name = "scroll_bar",
@@ -302,7 +319,7 @@ function PlayOnlineGui:_setup()
 			})
 			self._list_scroll_bar_box_class:set_aligns("scale", "scale")
 			scroll_bar_box_panel:set_w(8)
-			scroll_bar_box_panel:set_center_x(scroll_bar:w() / 2)
+			scroll_bar_box_panel:set_center_x(scroll_bar:w() * 0.5)
 			scroll_bar:set_top(scroll_up_indicator_arrow:top())
 			scroll_bar:set_center_x(scroll_up_indicator_arrow:center_x())
 
@@ -320,6 +337,36 @@ function PlayOnlineGui:_setup()
 		difficulty_label:move(padding + 20, y)
 		y = y + difficulty_label:height()
 		]]--
+
+	local bottompnl = self._panel:panel({name = "bottompnl"})
+	bottompnl:set_w(self._panel:w())
+	bottompnl:set_h(32)
+	bottompnl:set_top(listpnl:bottom() + MARGIN)
+	bottompnl:set_left(heistpnl:left())
+	self.bottom_panel = bottompnl
+	BoxGuiObject:new(bottompnl, {sides = {1, 1, 1, 1}})
+
+		local heisters_label = SH.QuickLabel(bottompnl, "heisters_x", utf8.to_upper(managers.localization:text("heisters_x")) .. "0")
+		self.heisters_label = heisters_label
+
+		managers.gui_data:safe_to_full_16_9(heisters_label:world_x(), heisters_label:world_center_y())
+		heisters_label:set_left(padding)
+		heisters_label:set_center_y(bottompnl:height() * 0.5)
+
+		local update_text = bottompnl:text({
+			name = "update_button",
+			text = utf8.to_upper(managers.localization:text("update")),
+			align = "right",
+			vertical = "center",
+			h = tweak_data.menu.pd2_small_font_size,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			font = tweak_data.menu.pd2_small_font,
+			blend_mode = "add",
+			color = tweak_data.screen_colors.button_stage_3
+		})
+		
+		update_text:set_right(bottompnl:width() - padding)
+		update_text:set_center_y(bottompnl:height() * 0.5)
 
 	if (managers.menu:is_pc_controller()) then
 		local back_text = self._panel:text({
@@ -401,15 +448,30 @@ function PlayOnlineGui:mouse_moved(o, x, y)
 			back_button:set_color(tweak_data.screen_colors.button_stage_3)
 		end
 
+		local update_button = self.bottom_panel:child("update_button")
+		if (update_button:inside(x, y)) then
+			if not self._update_highlight then
+				self._update_highlight = true
+				update_button:set_color(tweak_data.screen_colors.button_stage_2)
+				managers.menu_component:post_event("highlight")
+			end
+		else
+			self._update_highlight = false
+			update_button:set_color(tweak_data.screen_colors.button_stage_3)
+		end
+
 		-- Recipe for bad lags?
 		for id, pnl in pairs (self.server_list_panels) do
+			local x2, y2 = pnl:world_left(), pnl:world_top()
+		
 			local bg = pnl:child("bg")
-			if (pnl:inside(x, y)) then
+			if (self.list_panel and self.list_panel:inside(x2, y2) and pnl:inside(x, y)) then
 				local job = self.server_list[id]
 				if (job) then
 					if (bg) then
 						bg:set_alpha(0.1)
 					end
+
 					self:update_server_info(job)
 				end
 			else
@@ -420,7 +482,7 @@ function PlayOnlineGui:mouse_moved(o, x, y)
 		end
 	end
 
-	if self._panel:inside(x, y) then
+	if (self._panel:inside(x, y)) then
 		return true
 	end
 end
@@ -431,12 +493,20 @@ function PlayOnlineGui:mouse_pressed(button, x, y)
 			return
 		end
 
-		for id, pnl in pairs (self.server_list_panels) do
-			if (pnl:inside(x, y)) then
-				local job = self.server_list[id]
-				managers.network.matchmake:join_server_with_check(job.room_id)
+		if (self.bottom_panel:child("update_button"):inside(x, y)) then
+			self:start_finding_servers()
+			return
+		end
 
-				break
+		for id, pnl in pairs (self.server_list_panels) do
+			local x2, y2 = pnl:world_left(), pnl:world_top()
+			if (self.list_panel and self.list_panel:inside(x2, y2)) then
+				if (pnl:inside(x, y)) then
+					local job = self.server_list[id]
+					managers.network.matchmake:join_server_with_check(job.room_id)
+
+					break
+				end
 			end
 		end
 	end
