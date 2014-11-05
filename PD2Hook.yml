@@ -1,5 +1,5 @@
 Config:
-  OutputMode: 7
+  OutputMode: 0
   OutputFile: PD2Hook.log
   PrintOffsets: false
 PostRequireScripts:
