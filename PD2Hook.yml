@@ -1,0 +1,9 @@
+Config:
+  OutputMode: 7
+  OutputFile: PD2Hook.log
+  PrintOffsets: false
+PostRequireScripts:
+  - ["lib/managers/menumanager", 'Shenesis\core.lua']
+  - ["lib/managers/localizationmanager", 'Shenesis\core.lua']
+  - ["lib/managers/crimenetmanager", 'Shenesis\core.lua']
+  - ["lib/managers/menu/menucomponentmanager", 'Shenesis\core.lua']
